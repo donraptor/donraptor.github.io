@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title>Don's TF RNG</title>
+    <style>
+      #reroll-link {
+        font-size: 4em;
+        background: black;
+        color: white;
+        text-decoration: none;
+        padding: 0.3em;
+        display: inline-block;
+      }
+      #tf_main {
+        font-size: 5em;
+      }
+      rngelement {
+        color: red;
+      }
+    </style>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.3.10/seedrandom.min.js>
+    </script>
+    <script>
+      function gen_tf() {
+        document.getElementById("reroll-link").href = "#" + Math.floor(Math.random() * 10000000000);
+        var rng = new Math.seedrandom(window.location.hash);
+        var template = 
+        `
+        They are a {bodytype=taur|feral|anthro}
+        With { a pussymouth | a puckermouth | no mouth | a normal mouth}
+        They have {breasts | no breasts} and a {pussy | dick | null bulge}
+        {Their head is swapped with their crotch|Their head is detached from their body|}
+        `
+        template = template.trim();
+        const match_template = /\{[^\}]*\}/g;
+        var rendered_template = template.replace(match_template, function (str) {
+          var str = str.slice(1, -1);
+          console.log(str);
+          var assignment = str.split("=", 2);
+          var options = "";
+          if (assignment.length > 1) {
+            options = assignment[1];
+            assignment = assignment[0];
+          } else {
+            options = assignment[0];
+            assignment = "";
+          }
+          options = options.split("|");
+          var index = Math.floor(rng() * options.length);
+          var option = options[index].trim();
+          if (option === "") {
+            return "";
+          }
+          return "<rngelement>" + options[index] + "</rngelement>";
+        })
+        rendered_template = rendered_template.replace(/\n+/g, "<br/>");
+        console.log(rendered_template);
+        document.getElementById("tf_main").innerHTML = rendered_template;
+      }
+    </script>
+  </head>
+  <body onload="gen_tf()">
+    <a href="#asdf" onclick="setTimeout(gen_tf, 1)" id="reroll-link">re-roll</a>
+    <main id="tf_main"></main>
+  </body>
+</html>
